@@ -327,11 +327,17 @@ float AXP2101Component::get_setup_priority() const { return setup_priority::DATA
 
 void AXP2101Component::update() {
 
-    if (this->batterylevel_sensor_ != nullptr) {
-        float vbat = GetBatVoltage();
+    float vbat = 0.0f;
+    if (this->batteryvoltage_sensor_ != nullptr || this->batterylevel_sensor_ != nullptr) {
+        vbat = GetBatVoltage();
         ESP_LOGD(TAG, "Got Battery Voltage=%f", vbat);
-        this->batteryvoltage_sensor_->publish_state(vbat / 1000.0f);
+    }
 
+    if (this->batteryvoltage_sensor_ != nullptr) {
+        this->batteryvoltage_sensor_->publish_state(vbat / 1000.0f);
+    }
+
+    if (this->batterylevel_sensor_ != nullptr) {
         float batterylevel;
         if (isBatteryConnect()) {
             batterylevel = getBatteryPercent();
